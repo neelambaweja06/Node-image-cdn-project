@@ -22,15 +22,21 @@
 // module.exports = upload;
 
 
+
+
+
 const multer = require("multer");
 
 const storage = multer.diskStorage({
-  destination: "uploads/",
-  filename: (req, file, cb) => {
-    cb(null, Date.now() + "-" + file.originalname);
-  }
+  destination: function (req, file, cb) {
+    cb(null, "uploads/");
+  },
+  filename: function (req, file, cb) {
+    const uniqueName = Date.now() + "-" + file.originalname;
+    cb(null, uniqueName);
+  },
 });
 
-const upload = multer({ storage });
+const upload = multer({ storage: storage });
 
 module.exports = upload;

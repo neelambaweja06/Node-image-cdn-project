@@ -10,10 +10,14 @@
 
 
 
-const upload = require("../middleware/upload");
 
-router.post(
-  "/upload-photos",
-  upload.array("photos", 20), // upload max 20 photos
-  controller.uploadPhotos
-);
+
+const express = require("express");
+const router = express.Router();
+const upload = require("../middleware/upload");
+const imageController = require("../controllers/uploadController");
+
+// bulk upload
+router.post("/bulk-upload", upload.array("images", 20), imageController.bulkUpload);
+
+module.exports = router;
