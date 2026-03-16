@@ -13,8 +13,8 @@ const storage = multer.diskStorage({
 
   filename: function (req, file, cb) {
 
-    const ext = file.mimetype.split("/")[1]; 
-    const uniqueName = Date.now() + "." + ext;
+    const ext = path.extname(file.originalname);
+    const uniqueName = Date.now() + ext;
 
     cb(null, uniqueName);
   }
@@ -25,16 +25,17 @@ const upload = multer({ storage });
 
 app.use("/uploads", express.static("uploads"));
 
-app.post("/upload", upload.single("image"), (req, res) => {
+app.post("/uploads", upload.array("images",20),(req,res)=>{
 
-  const imageUrl = `${process.env.BASE_URL}/uploads/${req.file.filename}`;
+ const imageUrls = req.files.map(file=>{
+   return `${process.env.BASE_URL}/uploads/${file.filename}`
+ })
 
-  res.json({
-    message: "Image uploaded successfully",
-    url: imageUrl
-  });
+ res.json({
+   images:imageUrls
+ })
 
-});
+})
 
 app.listen(4000, () => {
   console.log("CDN server running on port 4000");

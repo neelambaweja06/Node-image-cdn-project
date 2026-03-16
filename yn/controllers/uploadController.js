@@ -1,69 +1,39 @@
-// const axios = require("axios");
-// const fs = require("fs");
-// const FormData = require("form-data");
-// const Image = require("../models/imageModel");
+const axios = require("axios");
+const fs = require("fs");
+const FormData = require("form-data");
+const Image = require("../models/imageModel");
 
-// exports.uploadImage = async (req, res) => {
+exports.uploadImages = async (req, res) => {
 
-//   try {
-
-//     if (!req.file) {
-//       return res.status(400).json({
-//         message: "No image file provided"
-//       });
-//     }
-
-//     const form = new FormData();
-
-//     form.append("image", fs.createReadStream(req.file.path));
-//     form.append("project_name", "main-project");
-
-//     const response = await axios.post(
-//       "http://localhost:4000/upload",
-//       form,
-//       { headers: form.getHeaders() }
-//     );
-
-//     const imageUrl = response.data.url;
-
-//     await Image.saveImage(imageUrl);
-
-//     return res.status(201).json({
-//       message: "Image uploaded successfully",
-//       url: imageUrl
-//     });
-
-//   } catch (error) {
-
-//     console.error(error);
-
-//     return res.status(500).json({
-//       message: "Image upload failed",
-//       error: error.message
-//     });
-
-//   }
-
-// };
-
-
-
-
-
-exports.bulkUpload = async (req, res) => {
   try {
 
-    const files = req.files;
+    const files = req.files || (req.file ? [req.file] : []);
 
-    if (!files || files.length === 0) {
+    if (!files.length) {
       return res.status(400).json({
         message: "No images uploaded"
       });
     }
 
-    const imageUrls = files.map(file => {
-      return `http://localhost:3000/uploads/${file.filename}`;
+    const formData = new FormData();
+
+    files.forEach(file => {
+      formData.append("images", fs.createReadStream(file.path));
     });
+
+    // CDN server call
+    const response = await axios.post(
+      "http://localhost:4000/uploads",
+      formData,
+      { headers: formData.getHeaders() }
+    );
+
+    const imageUrls = response.data.images || [response.data.url];
+
+    // Save URLs in database
+    for (let url of imageUrls) {
+      await Image.saveImage(url);
+    }
 
     res.status(200).json({
       message: "Images uploaded successfully",
@@ -72,11 +42,13 @@ exports.bulkUpload = async (req, res) => {
 
   } catch (error) {
 
-    console.log(error);
+    console.error(error);
 
     res.status(500).json({
-      message: "Server error"
+      message: "Upload failed",
+      error: error.message
     });
 
   }
+
 };

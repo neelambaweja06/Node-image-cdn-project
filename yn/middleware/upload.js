@@ -1,42 +1,17 @@
-// const multer = require("multer");
-// const path = require("path");
-
-// const storage = multer.diskStorage({
-
-//   destination: function (req, file, cb) {
-//     cb(null, "temp/");
-//   },
-
-//   filename: function (req, file, cb) {
-
-//     const ext = path.extname(file.originalname);
-//     const uniqueName = Date.now() + ext;
-
-//     cb(null, uniqueName);
-//   }
-
-// });
-
-// const upload = multer({ storage });
-
-// module.exports = upload;
-
-
-
-
-
 const multer = require("multer");
+const path = require("path");
 
 const storage = multer.diskStorage({
   destination: function (req, file, cb) {
-    cb(null, "uploads/");
+    cb(null, "uploads/"); // YN server temp storage
   },
   filename: function (req, file, cb) {
-    const uniqueName = Date.now() + "-" + file.originalname;
+    const ext = path.extname(file.originalname);
+    const uniqueName = Date.now() + ext;
     cb(null, uniqueName);
-  },
+  }
 });
 
-const upload = multer({ storage: storage });
+const upload = multer({ storage });
 
 module.exports = upload;
