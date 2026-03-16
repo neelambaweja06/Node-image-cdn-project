@@ -40,3 +40,4 @@ app.post("/uploads", upload.array("images",20),(req,res)=>{
 app.listen(4000, () => {
   console.log("CDN server running on port 4000");
 });
+

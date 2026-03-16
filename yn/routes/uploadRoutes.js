@@ -1,10 +1,13 @@
+
+
+
 const express = require("express");
 const router = express.Router();
-const upload = require("../middleware/upload");
-const imageController = require("../controllers/uploadController");
 
-// bulk upload
-router.post("/uploads", upload.array("images",20), imageController.uploadImages);
+const upload = require("../middlewares/upload");
+const controller = require("../controllers/uploadController");
+
+router.post("/upload", upload.array("images"), controller.uploadImages);
 
 module.exports = router;
 

@@ -1,15 +1,13 @@
 const axios = require("axios");
-const fs = require("fs");
 const FormData = require("form-data");
-const Image = require("../models/imageModel");
 
 exports.uploadImages = async (req, res) => {
 
   try {
 
-    const files = req.files || (req.file ? [req.file] : []);
+    const files = req.files;
 
-    if (!files.length) {
+    if (!files || files.length === 0) {
       return res.status(400).json({
         message: "No images uploaded"
       });
@@ -18,37 +16,32 @@ exports.uploadImages = async (req, res) => {
     const formData = new FormData();
 
     files.forEach(file => {
-      formData.append("images", fs.createReadStream(file.path));
+      formData.append("images", file.buffer, file.originalname);
     });
 
-    // CDN server call
     const response = await axios.post(
       "http://localhost:4000/uploads",
       formData,
       { headers: formData.getHeaders() }
     );
 
-    const imageUrls = response.data.images || [response.data.url];
-
-    // Save URLs in database
-    for (let url of imageUrls) {
-      await Image.saveImage(url);
-    }
-
-    res.status(200).json({
-      message: "Images uploaded successfully",
-      images: imageUrls
+    res.json({
+      message: "Images uploaded to CDN",
+      images: response.data.images
     });
 
   } catch (error) {
 
-    console.error(error);
+    console.log(error);
 
     res.status(500).json({
-      message: "Upload failed",
-      error: error.message
+      message: "Upload failed"
     });
 
   }
 
 };
+
+
+
+
