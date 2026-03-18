@@ -5,9 +5,17 @@ async function up() {
   const query = `
     CREATE TABLE IF NOT EXISTS users (
       id INT AUTO_INCREMENT PRIMARY KEY,
-      name VARCHAR(100) NOT NULL,
-      email VARCHAR(100) UNIQUE NOT NULL,
+
+      first_name VARCHAR(100) NOT NULL,
+      last_name VARCHAR(100),
+
+      user_name VARCHAR(100) UNIQUE,
+
+      email VARCHAR(150) UNIQUE NOT NULL,
+      mobile_number VARCHAR(15),
+
       password VARCHAR(255) NOT NULL,
+
       created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
       updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP 
       ON UPDATE CURRENT_TIMESTAMP

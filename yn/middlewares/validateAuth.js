@@ -1,15 +1,42 @@
+// exports.validateRegister = (req, res, next) => {
+
+//     const { name, email, password } = req.body;
+
+//     if (!name || !email || !password) {
+//         return res.status(400).json({
+//             message: "Name, email and password are required"
+//         });
+//     }
+
+//     next(); // move to controller
+// };
+
+
+
+
 exports.validateRegister = (req, res, next) => {
 
-    const { name, email, password } = req.body;
+    const {
+        first_name,
+        last_name,
+        email,
+        mobile_number,
+        password
+    } = req.body;
 
-    if (!name || !email || !password) {
+    if (!first_name || !email || !password) {
         return res.status(400).json({
-            message: "Name, email and password are required"
+            message: "First name, email and password are required"
         });
     }
 
-    next(); // move to controller
+    next();
 };
+
+
+
+
+
 
 
 
