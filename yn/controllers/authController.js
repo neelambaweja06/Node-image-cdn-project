@@ -20,18 +20,23 @@ const register = async (req, res) => {
 
     const hash = await bcrypt.hash(password, 10);
 
+    // 👇 default role_id = 2 (user)
+    const role_id = 2;
+
     await User.createUser(
       first_name,
       last_name,
       user_name,
       email,
       mobile_number,
-      hash
+      hash,
+      role_id // 👈 added
     );
 
     res.status(201).json({
       message: "User registered successfully",
-      user_name
+      user_name,
+      role : "user"
     });
 
   } catch (err) {
@@ -68,7 +73,12 @@ const login = async (req, res) => {
     }
 
     res.json({
-      message: "Login successful"
+      message: "Login successful",
+      user: {
+        id: user.id,
+        email: user.email,
+        role_id: user.role_id // 👈 IMPORTANT
+      }
     });
 
   } catch (err) {

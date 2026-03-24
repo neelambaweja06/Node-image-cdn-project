@@ -1,25 +1,19 @@
 const db = require("../config/db");
 
-// exports.createUser = async (name, email, password) => {
 
-//     const sql = "INSERT INTO users(name,email,password) VALUES(?,?,?)";
-
-//     const [result] = await db.query(sql, [name, email, password]);
-
-//     return result;
-// };
 exports.createUser = async (
   first_name,
   last_name,
   user_name,
   email,
   mobile_number,
-  password
+  password,
+  role_id // 👈 added
 ) => {
   const sql = `
     INSERT INTO users 
-    (first_name, last_name, user_name, email, mobile_number, password) 
-    VALUES (?, ?, ?, ?, ?, ?)
+    (first_name, last_name, user_name, email, mobile_number, password,role_id) 
+    VALUES (?, ?, ?, ?, ?, ?, ?)
   `;
 
   const [result] = await db.query(sql, [
@@ -29,6 +23,7 @@ exports.createUser = async (
     email,
     mobile_number,
     password,
+    role_id, // 👈 added
   ]);
 
   return result;

@@ -16,9 +16,14 @@ async function up() {
 
       password VARCHAR(255) NOT NULL,
 
+      role_id INT DEFAULT 2,
+
       created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
       updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP 
-      ON UPDATE CURRENT_TIMESTAMP
+      ON UPDATE CURRENT_TIMESTAMP,
+
+      FOREIGN KEY (role_id) REFERENCES roles(id)
+
     );
   `;
 
