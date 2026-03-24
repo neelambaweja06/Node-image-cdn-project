@@ -1,59 +1,56 @@
 const bcrypt = require("bcrypt");
+const jwt = require("jsonwebtoken");
 const User = require("../models/userModel");
 
-// ✅ register
+// REGISTER
 const register = async (req, res) => {
   try {
-    const {
-      first_name,
-      last_name,
-      email,
-      mobile_number,
-      password,
-    } = req.body;
+    const { first_name, last_name, email, mobile_number, password } = req.body;
 
-    if (!first_name || !email || !password) {
-      return res.json({ message: "Required fields missing" });
-    }
-
-    const user_name = (first_name + " " + (last_name || ""));
+    const user_name = first_name + " " + (last_name || "");
 
     const hash = await bcrypt.hash(password, 10);
 
-    // 👇 default role_id = 2 (user)
-    const role_id = 2;
+    const role_id = 2; // default user
 
-    await User.createUser(
+    const userId = await User.createUser(
       first_name,
       last_name,
       user_name,
       email,
       mobile_number,
       hash,
-      role_id // 👈 added
+      role_id
     );
 
-    res.status(201).json({
+    return res.status(201).json({
+      success: true,
       message: "User registered successfully",
-      user_name,
-      role : "user"
+      data: {
+        id: userId,
+        name: user_name,
+        email,
+        mobile_number,
+        role: "user"
+      }
     });
 
   } catch (err) {
     if (err.code === "ER_DUP_ENTRY") {
       return res.status(400).json({
-        message: "Email or Username already exists",
+        success: false,
+        message: "Email already exists"
       });
     }
 
-    res.status(500).json({
-      message: "Server error",
-      error: err.message,
+    return res.status(500).json({
+      success: false,
+      message: "Internal server error"
     });
   }
 };
 
-// ✅ login
+// LOGIN
 const login = async (req, res) => {
   try {
     const { email, password } = req.body;
@@ -61,7 +58,10 @@ const login = async (req, res) => {
     const result = await User.findUser(email);
 
     if (result.length === 0) {
-      return res.json({ message: "User not found" });
+      return res.status(404).json({
+        success: false,
+        message: "User not found"
+      });
     }
 
     const user = result[0];
@@ -69,28 +69,39 @@ const login = async (req, res) => {
     const match = await bcrypt.compare(password, user.password);
 
     if (!match) {
-      return res.json({ message: "Wrong password" });
+      return res.status(401).json({
+        success: false,
+        message: "Invalid credentials"
+      });
     }
 
-    res.json({
+    const token = jwt.sign(
+      { id: user.id, email: user.email, role_id: user.role_id },
+      process.env.JWT_SECRET,
+      { expiresIn: "1h" }
+    );
+
+    return res.status(200).json({
+      success: true,
       message: "Login successful",
-      user: {
-        id: user.id,
-        email: user.email,
-        role_id: user.role_id // 👈 IMPORTANT
+      data: {
+        user: {
+          id: user.id,
+          name: user.user_name,
+          email: user.email,
+          role_id: user.role_id
+        },
+        token
       }
     });
 
   } catch (err) {
-    res.status(500).json({
-      message: "Server error",
-      error: err.message
+    console.error("LOGIN ERROR:", err);
+    return res.status(500).json({
+      success: false,
+      message: "Internal server error"
     });
   }
 };
 
-// ✅ export ALL
-module.exports = {
-  register,
-  login
-};
+module.exports = { register, login };
