@@ -90,26 +90,7 @@ const updateUser = async (req, res) => {
 
 
 
-// const updateUser = async (req, res) => {
-//   try {
-//     const userId = req.params.id;
 
-//     const { first_name, last_name, mobile_number } = req.body;
-
-//     await User.updateUser(userId, first_name, last_name, mobile_number);
-
-//     return res.status(200).json({
-//       success: true,
-//       message: "User updated successfully"
-//     });
-
-//   } catch (err) {
-//     return res.status(500).json({
-//       success: false,
-//       message: "Internal server error"
-//     });
-//   }
-// };
 
 // ✅ DELETE USER BY ID
 const deleteUser = async (req, res) => {
