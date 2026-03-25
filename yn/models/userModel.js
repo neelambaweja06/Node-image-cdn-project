@@ -49,17 +49,39 @@ exports.getUserById = async (id) => {
   return rows[0]; // 👈 MUST return single user
 };
 
-
-// UPDATE USER
-exports.updateUser = async (id, first_name, last_name, mobile_number) => {
+exports.updateUser = async (
+  id,
+  first_name,
+  last_name,
+  mobile_number,
+  role_id
+) => {
   const sql = `
     UPDATE users 
-    SET first_name = ?, last_name = ?, mobile_number = ?
+    SET first_name = ?, last_name = ?, mobile_number = ?, role_id = ?
     WHERE id = ?
   `;
 
-  await db.query(sql, [first_name, last_name, mobile_number, id]);
+  const [result] = await db.query(sql, [
+    first_name,
+    last_name,
+    mobile_number,
+    role_id,
+    id
+  ]);
+
+  return result; // 🔥 important
 };
+// // UPDATE USER
+// exports.updateUser = async (id, first_name, last_name, mobile_number) => {
+//   const sql = `
+//     UPDATE users 
+//     SET first_name = ?, last_name = ?, mobile_number = ?
+//     WHERE id = ?
+//   `;
+
+//   await db.query(sql, [first_name, last_name, mobile_number, id]);
+// };
 
 // DELETE USER
 exports.deleteUser = async (id) => {

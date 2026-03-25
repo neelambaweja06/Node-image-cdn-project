@@ -57,9 +57,22 @@ const updateUser = async (req, res) => {
   try {
     const userId = req.params.id;
 
-    const { first_name, last_name, mobile_number } = req.body;
+    const { first_name, last_name, mobile_number, role_id } = req.body;
 
-    await User.updateUser(userId, first_name, last_name, mobile_number);
+    const result = await User.updateUser(
+      userId,
+      first_name,
+      last_name,
+      mobile_number,
+      role_id
+    );
+
+    if (result.affectedRows === 0) {
+      return res.status(404).json({
+        success: false,
+        message: "User not found"
+      });
+    }
 
     return res.status(200).json({
       success: true,
@@ -67,12 +80,36 @@ const updateUser = async (req, res) => {
     });
 
   } catch (err) {
+    console.error("UPDATE ERROR:", err);
     return res.status(500).json({
       success: false,
       message: "Internal server error"
     });
   }
 };
+
+
+
+// const updateUser = async (req, res) => {
+//   try {
+//     const userId = req.params.id;
+
+//     const { first_name, last_name, mobile_number } = req.body;
+
+//     await User.updateUser(userId, first_name, last_name, mobile_number);
+
+//     return res.status(200).json({
+//       success: true,
+//       message: "User updated successfully"
+//     });
+
+//   } catch (err) {
+//     return res.status(500).json({
+//       success: false,
+//       message: "Internal server error"
+//     });
+//   }
+// };
 
 // ✅ DELETE USER BY ID
 const deleteUser = async (req, res) => {
